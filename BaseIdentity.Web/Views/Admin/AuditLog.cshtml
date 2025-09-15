@@ -1,0 +1,100 @@
+﻿@using BaseIdentity.Data.Entity
+@using BaseIdentity.Services.Models
+@using BaseIdentity.Web.Models
+@model (PagedResult<AdminActionLog> Result, AuditLogFilterViewModel Filter)
+@{
+    ViewBag.Title = "Audit Log";
+    var f = Model.Filter;
+    string SortLink(string col)
+        => Url.Action("AuditLog", new {
+            AdminEmail = f.AdminEmail,
+            ActionType = f.ActionType,
+            FromUtc = f.FromUtc?.ToString("u"),
+            ToUtc = f.ToUtc?.ToString("u"),
+            SortBy = col,
+            Desc = (f.SortBy == col ? !f.Desc : true),
+            Page = 1,
+            PageSize = f.PageSize
+        })!;
+}
+<h3>Audit Log</h3>
+
+<form method="get" asp-action="AuditLog" class="row g-3 mb-3">
+    <div class="col-sm-3">
+        <label class="form-label">Admin Email</label>
+        <input name="AdminEmail" value="@f.AdminEmail" class="form-control" />
+    </div>
+    <div class="col-sm-3">
+        <label class="form-label">Action Type</label>
+        <select name="ActionType" class="form-select">
+            <option value="">(any)</option>
+            @foreach (var t in f.AvailableActionTypes)
+            {
+                <option value="@t" selected="@(t == f.ActionType ? "selected" : null)">@t</option>
+            }
+        </select>
+    </div>
+    <div class="col-sm-3">
+        <label class="form-label">From (UTC)</label>
+        <input type="datetime-local" name="FromUtc" value="@(f.FromUtc?.ToString("yyyy-MM-ddTHH:mm") ?? "")" class="form-control" />
+    </div>
+    <div class="col-sm-3">
+        <label class="form-label">To (UTC)</label>
+        <input type="datetime-local" name="ToUtc" value="@(f.ToUtc?.ToString("yyyy-MM-ddTHH:mm") ?? "")" class="form-control" />
+    </div>
+    <div class="col-sm-2">
+        <label class="form-label">Page Size</label>
+        <input type="number" min="1" max="200" name="PageSize" value="@f.PageSize" class="form-control" />
+    </div>
+    <div class="col-sm-10 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary me-2">Apply</button>
+        <a class="btn btn-outline-secondary" asp-action="AuditLog">Reset</a>
+    </div>
+</form>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th><a href="@SortLink("Timestamp")">Timestamp (UTC)</a></th>
+            <th><a href="@SortLink("AdminEmail")">Admin</a></th>
+            <th><a href="@SortLink("ActionType")">Action</a></th>
+            <th><a href="@SortLink("Target")">Target</a></th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var log in Model.Result.Items)
+    {
+        <tr>
+            <td>@log.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+            <td>@log.AdminEmail</td>
+            <td>@log.ActionType</td>
+            <td>@log.Target</td>
+            <td>@log.Details</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@if (Model.Result.TotalPages > 1)
+{
+    <nav>
+        <ul class="pagination">
+            @for (int p = 1; p <= Model.Result.TotalPages; p++)
+            {
+                <li class="page-item @(p == Model.Result.Page ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("AuditLog", new {
+                        AdminEmail = f.AdminEmail,
+                        ActionType = f.ActionType,
+                        FromUtc = f.FromUtc?.ToString("u"),
+                        ToUtc = f.ToUtc?.ToString("u"),
+                        SortBy = f.SortBy,
+                        Desc = f.Desc,
+                        Page = p,
+                        PageSize = f.PageSize
+                    })">@p</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

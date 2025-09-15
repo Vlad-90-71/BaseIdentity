@@ -1,0 +1,17 @@
+﻿@model BaseIdentity.Web.Models.CreateRoleViewModel
+@{
+    ViewBag.Title = "Create Role";
+}
+<h3>Create Role</h3>
+<form asp-action="CreateRole" method="post">
+    @Html.AntiForgeryToken()
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-success">Create</button>
+</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

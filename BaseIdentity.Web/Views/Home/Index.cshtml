@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    @if (User.Identity?.IsAuthenticated ?? false)
+    {
+        <p>Hello, <strong>@User.Identity!.Name</strong>!</p>
+        @if (User.IsInRole("Admin"))
+        {
+            <span class="badge bg-danger">Admin</span>
+        }
+        else
+        {
+            <span class="badge bg-secondary">User</span>
+        }
+    }
+    else
+    {
+        <p>You are not logged in.</p>
+        <a class="btn btn-primary" asp-controller="Account" asp-action="Login">Login</a>
+        <a class="btn btn-outline-secondary" asp-controller="Account" asp-action="Register">Register</a>
+    }
+</div>

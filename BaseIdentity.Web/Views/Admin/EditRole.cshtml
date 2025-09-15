@@ -1,0 +1,23 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@model BaseIdentity.Web.Models.EditUserRoleViewModel
+@{
+    ViewBag.Title = "Edit Role";
+}
+<h3>Edit Role for @Model.Email</h3>
+<form asp-action="EditRole" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="UserId" />
+    <div class="mb-3">
+        <label class="form-label">Current Role</label>
+        <input class="form-control" readonly value="@(Model.Roles.FirstOrDefault(r => r.Id == Model.CurrentRoleId)?.Name ?? "(none)")" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">New Role</label>
+        <select asp-for="NewRoleId" class="form-select" asp-items="@(new SelectList(Model.Roles, "Id", "Name", Model.CurrentRoleId))"></select>
+        <span asp-validation-for="NewRoleId" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
